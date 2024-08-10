@@ -35,7 +35,6 @@ public class AliyunSmsSenderServiceProvider implements MessageSenderService {
 
   @Override
   public void sendSmsMessage(TokenCodeType type, String phoneNumber, String code, int expires, String kind) throws MessageSendException {
-
     String kindName = OptionalUtils.ofBlank(kind).orElse(type.name().toLowerCase());
     String templateId = Optional.ofNullable(config.get(realm.getName().toLowerCase() + "-" + kindName + "-template"))
         .orElse(config.get(kindName + "-template"));

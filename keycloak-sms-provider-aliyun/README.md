@@ -32,3 +32,8 @@ type:
     RESET("reset credential"),
     REGISTRATION("registration");
 ```
+
+```text
+bin\kc.bat start-dev -
+-spi-phone-default-service=aliyun --spi-message-sender-service-aliyun-region=cn-hangzhou --spi-message-sender-service-aliyun-key=zzz  --spi-message-sender-service-aliyun-secret=zzz --spi-message-sender-service-aliyun-auth-template=zzz
+```

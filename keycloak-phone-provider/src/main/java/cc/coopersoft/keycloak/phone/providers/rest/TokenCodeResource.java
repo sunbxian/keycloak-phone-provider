@@ -5,16 +5,14 @@ import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
 import cc.coopersoft.keycloak.phone.providers.exception.PhoneNumberInvalidException;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneProvider;
 import org.jboss.logging.Logger;
-import org.jboss.resteasy.annotations.cache.NoCache;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.services.validation.Validation;
 
-import javax.validation.constraints.NotBlank;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Response;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
+import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
+import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 
 public class TokenCodeResource {
 
@@ -29,10 +27,9 @@ public class TokenCodeResource {
 
 
   @GET
-  @NoCache
   @Path("")
   @Produces(APPLICATION_JSON)
-  public Response getTokenCode(@NotBlank @QueryParam("phoneNumber") String phoneNumber,
+  public Response getTokenCode(@QueryParam("phoneNumber") String phoneNumber,
                                @QueryParam("kind") String kind) {
 
     if (Validation.isBlank(phoneNumber)) throw new BadRequestException("Must supply a phone number");

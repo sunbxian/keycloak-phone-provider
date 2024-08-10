@@ -60,7 +60,7 @@ public class BulksmsSmsSenderServiceProvider extends FullSmsSenderAbstractServic
     @Override
     public void sendMessage(String phoneNumber, String message) throws MessageSendException {
         HttpClient httpclient = HttpClients.createDefault();
-        SimpleHttp req = SimpleHttp.doPost(url, httpclient);
+        SimpleHttp req = SimpleHttp.doPost(url, (KeycloakSession) httpclient);
         req.json(new BulksmsMessage[] {
                 new BulksmsMessage(this.from, phoneNumber, message, this.encoding, this.routingGroup) });
         req.authBasic(this.username, this.password);

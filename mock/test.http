@@ -1,0 +1,30 @@
+http://localhost:8080/realms/yueqinglan/sms/authentication-code?phoneNumber=+8615889707030
+
+###
+POST http://localhost:8080/realms/yueqinglan/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type = password &
+phone_number = 15889707030 &
+code = 351046 &
+client_id = app
+
+###
+POST http://localhost:8080/realms/yueqinglan/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type = password &
+phone_number = 15889707030 &
+client_id = app
+
+
+
+
+###
+POST http://localhost:8080/realms/yueqinglan/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type = password &
+username = 15889707030 &
+password = 123456 &
+client_id = app

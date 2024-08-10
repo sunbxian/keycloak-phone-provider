@@ -9,24 +9,24 @@ import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialProvider;
 import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialProviderFactory;
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneProvider;
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
 import org.jboss.logging.Logger;
-import org.jboss.resteasy.spi.HttpResponse;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.AuthenticationFlowError;
 import org.keycloak.authentication.Authenticator;
 import org.keycloak.authentication.CredentialValidator;
-import org.keycloak.common.util.ServerCookie;
 import org.keycloak.credential.CredentialProvider;
-import org.keycloak.models.*;
-import org.keycloak.models.credential.dto.OTPSecretData;
+import org.keycloak.models.KeycloakSession;
+import org.keycloak.models.RealmModel;
+import org.keycloak.models.UserCredentialModel;
+import org.keycloak.models.UserModel;
 import org.keycloak.services.validation.Validation;
-import org.keycloak.util.JsonSerialization;
 
-import javax.ws.rs.ForbiddenException;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import java.io.IOException;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import java.net.URI;
 import java.util.Optional;
 
@@ -92,11 +92,42 @@ public class SmsOtpMfaAuthenticator implements Authenticator, CredentialValidato
   }
 
   public void addCookie(AuthenticationFlowContext context, String name, String value, String path, String domain, String comment, int maxAge, boolean secure, boolean httpOnly) {
-    HttpResponse response = context.getSession().getContext().getContextObject(HttpResponse.class);
-    StringBuilder cookieBuf = new StringBuilder();
-    ServerCookie.appendCookieValue(cookieBuf, 1, name, value, path, domain, comment, maxAge, secure, httpOnly, null);
-    String cookie = cookieBuf.toString();
-    response.getOutputHeaders().add(HttpHeaders.SET_COOKIE, cookie);
+    // 获取 KeycloakSession
+    KeycloakSession session = context.getSession();
+
+    // 获取 HttpServletResponse 对象（通过 KeycloakSession 获取）
+    HttpServletResponse response = (HttpServletResponse) session.getContext().getHttpResponse();
+
+    // 创建 Cookie 对象
+    Cookie cookie = new Cookie(name, value);
+    cookie.setPath(path);
+    cookie.setDomain(domain);
+    cookie.setMaxAge(maxAge);
+    cookie.setSecure(secure);
+    cookie.setHttpOnly(httpOnly);
+
+    // 如果 comment 不为空，则在设置 cookie 的过程中手动添加 comment
+    if (comment != null && !comment.isEmpty()) {
+      cookie.setComment(comment);
+    }
+
+    // 将 Cookie 添加到响应
+    response.addCookie(cookie);
+
+    // 可选：手动设置 Set-Cookie 头来包含 comment
+    StringBuilder cookieHeader = new StringBuilder();
+    cookieHeader.append(cookie.getName()).append("=").append(cookie.getValue())
+            .append("; Path=").append(cookie.getPath())
+            .append("; Max-Age=").append(cookie.getMaxAge())
+            .append("; HttpOnly=").append(cookie.isHttpOnly())
+            .append("; Secure=").append(cookie.getSecure());
+
+    if (comment != null && !comment.isEmpty()) {
+      cookieHeader.append("; Comment=").append(comment);
+    }
+
+    // 添加到响应头
+    response.addHeader(HttpHeaders.SET_COOKIE, cookieHeader.toString());
   }
 
   @Override

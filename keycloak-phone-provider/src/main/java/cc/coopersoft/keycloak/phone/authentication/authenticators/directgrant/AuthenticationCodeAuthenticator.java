@@ -40,6 +40,7 @@ public class AuthenticationCodeAuthenticator extends BaseDirectGrantAuthenticato
 
         getAuthenticationCode(context).ifPresentOrElse(code -> {
             try {
+                logger.info("Grant authenticator valid code successful" + code);
                 context.getSession().getProvider(PhoneVerificationCodeProvider.class).validateCode(context.getUser(), phoneNumber, code, TokenCodeType.AUTH);
                 context.success();
             } catch (Exception e) {
